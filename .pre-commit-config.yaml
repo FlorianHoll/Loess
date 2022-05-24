@@ -19,7 +19,7 @@ repos:
       - id: reorder-python-imports
 
   - repo: https://github.com/psf/black # Black auto formatting.
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
 
