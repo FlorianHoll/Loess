@@ -1,0 +1,56 @@
+default_language_version:
+  python: python3.9
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      - id: check-added-large-files
+        args: ["--maxkb=400"]
+        exclude: "^()"
+      - id: check-ast
+      - id: check-merge-conflict # Check for files that contain merge conflict strings.
+      - id: end-of-file-fixer # Ensures that a file is either empty, or ends with one newline.
+      - id: trailing-whitespace # This hook trims trailing whitespace.
+
+  - repo: https://github.com/asottile/reorder_python_imports # Autosort python imports.
+    rev: v2.6.0
+    hooks:
+      - id: reorder-python-imports
+
+  - repo: https://github.com/psf/black # Black auto formatting.
+    rev: 21.12b0
+    hooks:
+      - id: black
+
+  - repo: https://gitlab.com/pycqa/flake8 # Flake8 formatting.
+    rev: 3.9.2
+    hooks:
+      - id: flake8
+        args: ["--max-line-length=80", "--ignore=E203,W503,F821,F811,F401"]
+
+  - repo: local # Pylint.
+    hooks:
+      - id: pylint
+        name: pylint-non-tests
+        entry: pylint
+        language: system
+        types: [python]
+        args:
+          [
+              "-rn",
+              "--jobs=4",
+              "--good-names=i,j,k,v,_,x,y,X,Y,X_train,X_test,df",
+              "--fail-under=8.5",
+              "--disable=import-error,wrong-import-order"
+          ]
+
+  - repo: https://github.com/pycqa/pydocstyle # Test all docstrings for correct syntax.
+    rev: 6.1.1
+    hooks:
+      - id: pydocstyle
+
+  - repo: https://github.com/asottile/pyupgrade # update syntax for newer versions of python.
+    rev: v2.31.0
+    hooks:
+    -   id: pyupgrade
