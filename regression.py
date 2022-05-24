@@ -68,15 +68,42 @@ class LinearRegression:
             X = np.c_[X, np.power(X, polynomial)]
         return X
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
-        """Create a proper model matrix and solve for the coefficients."""
+    def _create_model_matrix(self, X: np.ndarray) -> np.ndarray:
+        """Create and return the model matrix."""
         X = self._add_intercept(X)
         if self.polynomial_degree > 1:
-            X = self._add_polynomials(X, self.polynomial_degree)
+            X = self._add_polynomials(X)
+        return X
 
+    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+        """Create a proper model matrix and solve for the coefficients."""
+        X = self._create_model_matrix(X)
         self.betas = self._solve(X, y)
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Return predictions with the fitted coefficients."""
         self._raise_error_if_not_fitted()
-        return self._add_intercept(X) @ self.betas
+        return self._create_model_matrix(X) @ self.betas
+
+
+class WeightedLinearRegression(LinearRegression):
+    """Weighted linear regression.
+
+    This is a special case of linear regression that differs in
+        the derivation of the solution in that the model matrix
+        is multiplied with a weight matrix in order the weigh
+        the data points.
+    Since the class will be used for the lowess algorithm where
+        the tricube function is traditionally used, it is
+        implemented as the method to weigh the samples.
+    """
+
+    def fit(self, X: np.ndarray, W: np.ndarray, y: np.ndarray) -> None:
+        """Create the model matrix and solve for the coefficients."""
+        X = self._create_model_matrix(X)
+        self.betas = self.solve(X, W, y)
+
+    @staticmethod
+    def solve(X: np.ndarray, W: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Estimate the coefficients and return them."""
+        return np.linalg.inv(X.T @ W @ X) @ X.T @ W @ y
