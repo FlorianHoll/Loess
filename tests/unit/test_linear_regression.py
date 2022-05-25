@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.linear_model import LinearRegression as SKLearnLinearRegression
 
 from loess.regression import LinearRegression
+from loess.regression import WeightedLinearRegression
 
 
 class TestLinearRegression:
@@ -138,3 +139,27 @@ class TestLinearRegression:
             + 0.078 * np.power(new_x[:, 1], 5)
         )
         assert np.all(model.predict(new_x).round(5) == new_y.round(5))
+
+
+class TestWeightedLinearRegression:
+    """Tests for the weighted linear regression."""
+
+    @staticmethod
+    def test_weighted_linear_regression_recognizes_pattern():
+        """
+        GIVEN a data generating pattern
+        WHEN both a weighted linear regression and a regular regression are fitted
+            AND the weighting is an identity matrix
+        THEN the results should be the same.
+        """
+        x = np.random.normal(size=50).reshape(25, 2)
+        y = 3 + 2 * x[:, 0] - 0.75 * x[:, 1]
+        weighted_model = WeightedLinearRegression()
+        model = LinearRegression()
+        w = np.identity(x.shape[0])
+        model.fit(x, y)
+        weighted_model.fit(x, w, y)
+        assert np.all(model.coef_.round(10) == np.r_[2.0, -0.75].round(10))
+        assert np.all(model.coef_.round(10) == weighted_model.coef_.round(10))
+        assert round(model.intercept_, 3) == 3
+        assert weighted_model.intercept_ == model.intercept_
