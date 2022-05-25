@@ -19,7 +19,7 @@ repos:
       - id: reorder-python-imports
 
   - repo: https://github.com/psf/black # Black auto formatting.
-    rev: 21.12b0
+    rev: 22.3.0
     hooks:
       - id: black
 
@@ -27,7 +27,7 @@ repos:
     rev: 3.9.2
     hooks:
       - id: flake8
-        args: ["--max-line-length=80", "--ignore=E203,W503,F821,F811,F401"]
+        args: ["--max-line-length=100", "--ignore=E203,W503,F821,F811,F401"]
 
   - repo: local # Pylint.
     hooks:
@@ -49,6 +49,7 @@ repos:
     rev: 6.1.1
     hooks:
       - id: pydocstyle
+        exclude: "tests/"
 
   - repo: https://github.com/asottile/pyupgrade # update syntax for newer versions of python.
     rev: v2.31.0
