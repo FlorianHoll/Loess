@@ -63,16 +63,17 @@ class LinearRegression:
 
     def _add_polynomials(self, X: np.ndarray) -> np.ndarray:
         """Add polynomials to the model matrix (X)."""
+        nr_features = X.shape[1]
         polynomials_to_add = np.arange(2, self.polynomial_degree + 1)
         for polynomial in polynomials_to_add:
-            X = np.c_[X, np.power(X, polynomial)]
+            X = np.c_[X, np.power(X[:, :nr_features], polynomial)]
         return X
 
     def _create_model_matrix(self, X: np.ndarray) -> np.ndarray:
         """Create and return the model matrix."""
-        X = self._add_intercept(X)
         if self.polynomial_degree > 1:
             X = self._add_polynomials(X)
+        X = self._add_intercept(X)
         return X
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> None:
