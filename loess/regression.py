@@ -1,9 +1,6 @@
 """Linear Regression implementation in numpy."""
 import numpy as np
-
-
-class NotFittedError(ValueError):
-    """Own error class to indicate why the error was raised."""
+from NotFittedError import NotFittedError
 
 
 class LinearRegression:
@@ -20,10 +17,11 @@ class LinearRegression:
          Polynomials will be fitted for each of the predictor columns.
     """
 
-    def __init__(self, polynomial_degree: int = 1) -> None:
+    def __init__(self, polynomial_degree: int = 1, fit_intercept: bool = True) -> None:
         """Initialize the regression."""
         self.betas = None
         self.polynomial_degree = polynomial_degree
+        self.fit_intercept = fit_intercept
 
     @property
     def fitted(self):
@@ -71,15 +69,19 @@ class LinearRegression:
 
     def _create_model_matrix(self, X: np.ndarray) -> np.ndarray:
         """Create and return the model matrix."""
+        if X.ndim < 2:
+            X = X.reshape(-1, 1)
         if self.polynomial_degree > 1:
             X = self._add_polynomials(X)
-        X = self._add_intercept(X)
+        if self.fit_intercept:
+            X = self._add_intercept(X)
         return X
 
-    def fit(self, X: np.ndarray, y: np.ndarray) -> None:
+    def fit(self, X: np.ndarray, y: np.ndarray) -> "LinearRegression":
         """Create a proper model matrix and solve for the coefficients."""
         X = self._create_model_matrix(X)
         self.betas = self._solve(X, y)
+        return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         """Return predictions with the fitted coefficients."""
