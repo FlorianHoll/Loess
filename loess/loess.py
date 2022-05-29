@@ -4,8 +4,8 @@ from typing import Union
 
 import numpy as np
 import weighting as wg
-from NotFittedError import NotFittedError
 from regression import LinearRegression
+from regression import NotFittedError
 from regression import WeightedLinearRegression
 
 

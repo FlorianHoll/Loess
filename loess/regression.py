@@ -1,6 +1,9 @@
 """Linear Regression implementation in numpy."""
 import numpy as np
-from NotFittedError import NotFittedError
+
+
+class NotFittedError(ValueError):
+    """Own error class to indicate why the error was raised."""
 
 
 class LinearRegression:
