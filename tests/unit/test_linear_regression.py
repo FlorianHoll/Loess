@@ -11,6 +11,37 @@ class TestLinearRegression:
 
     @staticmethod
     def test_linear_regression_recognizes_pattern():
+        x = np.random.normal(size=50)
+        y = 3 + 2 * x
+        model = LinearRegression()
+        model.fit(x, y)
+        assert np.all(model.coef_.round(10) == np.r_[2.0])
+        assert round(model.intercept_, 10) == 3
+
+    @staticmethod
+    def test_results_match_sklearn():
+        x = np.random.normal(size=50)
+        y = np.random.normal(size=50)
+        model = LinearRegression()
+        model.fit(x, y)
+        sklearn_model = SKLearnLinearRegression()
+        sklearn_model.fit(x.reshape(-1, 1), y)
+
+        # check that estimated coefficients match.
+        assert np.all(
+            sklearn_model.coef_.round(10).flatten() == model.coef_.round(10).flatten()
+        )
+        assert sklearn_model.intercept_.round(10) == model.intercept_.round(10)
+
+        # check that prediction matches.
+        new_x = np.random.normal(size=100)
+        assert np.all(
+            sklearn_model.predict(new_x.reshape(-1, 1)).round(10)
+            == model.predict(new_x).round(10)
+        )
+
+    @staticmethod
+    def test_multivariate_linear_regression_recognizes_pattern():
         """
         GIVEN a data generating pattern
         WHEN a linear regression is fit
@@ -20,11 +51,11 @@ class TestLinearRegression:
         y = 3 + 2 * x[:, 0] - 0.75 * x[:, 1]
         model = LinearRegression()
         model.fit(x, y)
-        assert np.all(model.coef_.round(5) == np.r_[2.0, -0.75].round(5))
-        assert round(model.intercept_, 3) == 3
+        assert np.all(model.coef_.round(10) == np.r_[2.0, -0.75].round(10))
+        assert round(model.intercept_, 10) == 3
 
     @staticmethod
-    def test_results_match_sklearn():
+    def test_multivariate_results_match_sklearn():
         """
         GIVEN some data and a target
         WHEN a linear regression is fit
@@ -50,7 +81,7 @@ class TestLinearRegression:
         )
 
     @staticmethod
-    def test_prediction_works_as_expected():
+    def test_multivariate_prediction_works_as_expected():
         """
         GIVEN a data generating pattern
         WHEN the linear regression picked up on that pattern
@@ -65,7 +96,7 @@ class TestLinearRegression:
         assert np.all(y.round(10) == model.predict(new_x).round(10))
 
     @staticmethod
-    def test_polynomials_work():
+    def test_multivariate_polynomials_work():
         """
         GIVEN some data generating pattern
         WHEN a polynomial linear regression is fit
@@ -95,7 +126,7 @@ class TestLinearRegression:
         )
         assert np.all(model.predict(new_x).round(10) == new_y.round(10))
 
-    def test_higher_polynomials_work(self):
+    def test_multivariate_higher_polynomials_work(self):
         """
         GIVEN some data generating pattern
         WHEN a polynomial linear regression is fit
@@ -145,7 +176,7 @@ class TestWeightedLinearRegression:
     """Tests for the weighted linear regression."""
 
     @staticmethod
-    def test_weighted_linear_regression_recognizes_pattern():
+    def test_multivariate_weighted_linear_regression_recognizes_pattern():
         """
         GIVEN a data generating pattern
         WHEN both a weighted linear regression and a regular regression are fitted
@@ -161,5 +192,5 @@ class TestWeightedLinearRegression:
         weighted_model.fit(x, w, y)
         assert np.all(model.coef_.round(10) == np.r_[2.0, -0.75].round(10))
         assert np.all(model.coef_.round(10) == weighted_model.coef_.round(10))
-        assert round(model.intercept_, 3) == 3
+        assert round(model.intercept_, 10) == 3
         assert weighted_model.intercept_ == model.intercept_
