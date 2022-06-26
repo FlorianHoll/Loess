@@ -17,7 +17,7 @@ class Loess:
         self,
         share_of_points: float = 0.75,
         weighting: str = "tricubic",
-        nr_smoothing_iterations: int = 10,
+        nr_smoothing_iterations: int = 2,
         polynomial_degree: int = 1,
     ) -> None:
         """Initialize the Loess algorithm.
@@ -47,7 +47,7 @@ class Loess:
         self.nr_iterations = nr_smoothing_iterations + 1
         self.polynomial_degree = polynomial_degree
         self.nr_points_to_use = None
-        self.predictions = None
+        self.fitted_values = None
         self.x = None
         self.fitted = False
 
@@ -82,7 +82,7 @@ class Loess:
         :return: The fitted instance of the class.
         """
         self.nr_points_to_use = int(self.share_of_points * x.shape[0])
-        self.predictions = np.zeros_like(y)
+        self.fitted_values = np.zeros_like(y)
         if x.ndim < 2:
             x = x.reshape(-1, 1)
         self.x = x
@@ -96,7 +96,7 @@ class Loess:
             else:
                 # In further iterations, calculate robust weightings based
                 #   on the residuals.
-                robust_weightings = self._get_robust_weightings(self.predictions, y)
+                robust_weightings = self._get_robust_weightings(self.fitted_values, y)
 
             # Fit a local regression for each point, weighted with the weight matrix.
             self._fit_local_regression_for_each_point(x, robust_weightings, y)
@@ -145,7 +145,7 @@ class Loess:
     def _get_prediction_for_fitted_point(self, point: np.ndarray):
         """Get the fitted value for an already fitted value."""
         x_position = np.where(point == self.x)[0][0]
-        return self.predictions[x_position]
+        return self.fitted_values[x_position]
 
     def _interpolate(self, point: np.ndarray) -> np.ndarray:
         """Interpolate and return the prediction.
@@ -162,7 +162,8 @@ class Loess:
         #    can be given; therefore, a NaN is returned.
         if np.any(point < self.x.min(axis=0)) or np.any(point > self.x.max(axis=0)):
             print(
-                f"Warning: Value {point} to be predicted is outside the fitted region."
+                f"Warning: Value {point} to be predicted "
+                f"is outside the fitted region. Returning NaN."
             )
             return np.nan
         distances = self._get_distances_to_point(self.x, point, normalize=True)
@@ -251,4 +252,4 @@ class Loess:
             # Add the prediction of the regression as the prediction for
             #   the current data point.
             current_point = local_weighted_regression.predict(point.reshape(1, -1))
-            self.predictions[position] = current_point
+            self.fitted_values[position] = current_point
