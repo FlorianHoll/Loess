@@ -52,23 +52,31 @@ class LinearRegression:
         """Add an intercept to the model matrix.
 
         Since the intercept is just a constant, this corresponds
-            to a column of 1s in the first column of the model matrix.
-        :return: The model matrix with an added column for the intercept.
+            to a column of ones in the first column of the model matrix.
+        :return: The model matrix with an added column of ones for the intercept.
         """
         return np.c_[np.ones_like(X[:, 0]), X]
 
-    @staticmethod
-    def _solve(X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the coefficients and return them."""
-        return np.linalg.inv(X.T @ X) @ X.T @ y
-
     def _add_polynomials(self, X: np.ndarray) -> np.ndarray:
-        """Add polynomials to the model matrix (X)."""
+        """Add polynomials to the model matrix (X).
+
+        This corresponds to adding columns in the model matrix which
+            are the original model matrix values taken to the power of
+            the desired polynomial degree.
+        All lower-order polynomials are added as well; for example, if a
+            degree 4 polynomial is desired, polynomials of degree 2 and
+            3 are added as well.
+        """
         nr_features = X.shape[1]
         polynomials_to_add = np.arange(2, self.polynomial_degree + 1)
         for polynomial in polynomials_to_add:
             X = np.c_[X, np.power(X[:, :nr_features], polynomial)]
         return X
+
+    @staticmethod
+    def _solve(X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Estimate the coefficients and return them."""
+        return np.linalg.inv(X.T @ X) @ X.T @ y
 
     def _create_model_matrix(self, X: np.ndarray) -> np.ndarray:
         """Create and return the model matrix."""
@@ -81,7 +89,7 @@ class LinearRegression:
         return X
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "LinearRegression":
-        """Create a proper model matrix and solve for the coefficients."""
+        """Create the model matrix and solve for the coefficients."""
         X = self._create_model_matrix(X)
         self.betas = self._solve(X, y)
         return self
@@ -97,11 +105,10 @@ class WeightedLinearRegression(LinearRegression):
 
     This is a special case of linear regression that differs in
         the derivation of the solution in that the model matrix
-        is multiplied with a weight matrix in order the weigh
+        is multiplied with a weight matrix in order to weigh
         the data points.
-    Since the class will be used for the lowess algorithm where
-        the tricube function is traditionally used, it is
-        implemented as the method to weigh the samples.
+    This is needed for the Loess algorithm where a weighted linear
+        regression is used to obtain the predictions.
     """
 
     def fit(self, X: np.ndarray, W: np.ndarray, y: np.ndarray) -> None:
@@ -111,5 +118,11 @@ class WeightedLinearRegression(LinearRegression):
 
     @staticmethod
     def solve(X: np.ndarray, W: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the coefficients and return them."""
+        """Estimate the coefficients and return them.
+
+        The derivation of the parameters differs from a standard linear
+            regression in that the model matrix is multiplied with a
+            matrix of weights (W) that determines which data points are to
+            be weighted more - or less - in determining the parameters.
+        """
         return np.linalg.inv(X.T @ W @ X) @ X.T @ W @ y
