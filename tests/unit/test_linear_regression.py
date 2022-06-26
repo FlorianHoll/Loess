@@ -126,7 +126,8 @@ class TestLinearRegression:
         )
         assert np.all(model.predict(new_x).round(10) == new_y.round(10))
 
-    def test_multivariate_higher_polynomials_work(self):
+    @staticmethod
+    def test_multivariate_higher_polynomials_work():
         """
         GIVEN some data generating pattern
         WHEN a polynomial linear regression is fit

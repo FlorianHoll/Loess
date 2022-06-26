@@ -18,7 +18,7 @@ class Loess:
         share_of_points: float = 0.75,
         weighting: str = "tricubic",
         nr_smoothing_iterations: int = 2,
-        polynomial_degree: int = 1,
+        polynomial_degree: int = 2,
     ) -> None:
         """Initialize the Loess algorithm.
 
