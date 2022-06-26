@@ -40,8 +40,8 @@ repos:
           [
               "-rn",
               "--jobs=4",
-              "--good-names=i,j,k,v,_,x,y,X,Y,X_train,X_test,df",
-              "--fail-under=8.5",
+              "--good-names=_,x,y,w,X,Y,W",
+              "--fail-under=9.0",
               "--disable=import-error,wrong-import-order"
           ]
 
