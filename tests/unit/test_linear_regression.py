@@ -2,8 +2,8 @@
 import numpy as np
 from sklearn.linear_model import LinearRegression as SKLearnLinearRegression
 
-from loess.regression import LinearRegression
-from loess.regression import WeightedLinearRegression
+from local_regression.regression import LinearRegression
+from local_regression.regression import WeightedLinearRegression
 
 
 class TestLinearRegression:
