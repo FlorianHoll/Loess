@@ -1,7 +1,7 @@
 """Linear Regression implementation in numpy."""
 import numpy as np
 
-from _local_regression._not_fitted_error import NotFittedError
+from loess._not_fitted_error import NotFittedError
 
 
 class LinearRegression:

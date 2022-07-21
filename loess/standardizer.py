@@ -1,7 +1,7 @@
 """Standardize (z-transform) variables."""
 import numpy as np
 
-from _local_regression._not_fitted_error import NotFittedError
+from loess._not_fitted_error import NotFittedError
 
 
 class Standardizer:
@@ -13,7 +13,7 @@ class Standardizer:
         self.std = None
 
     def _fitted(self):
-        """Return indicator if the Standardizer was fitted yet."""
+        """Return indicator if the Standardizer has been fitted yet."""
         return self.mean is not None
 
     def _raise_error_if_not_fitted(self):

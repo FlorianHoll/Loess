@@ -4,11 +4,11 @@ from typing import Union
 
 import numpy as np
 
-import _local_regression.weightings as wg
-from _local_regression.regression import LinearRegression
-from _local_regression.regression import NotFittedError
-from _local_regression.regression import WeightedLinearRegression
-from _local_regression.standardizer import Standardizer
+import loess.weightings as wg
+from loess.regression import LinearRegression
+from loess.regression import NotFittedError
+from loess.regression import WeightedLinearRegression
+from loess.standardizer import Standardizer
 
 
 class Loess:
