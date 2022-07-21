@@ -3,11 +3,12 @@ from typing import List
 from typing import Union
 
 import numpy as np
-import weightings as wg
-from regression import LinearRegression
-from regression import NotFittedError
-from regression import WeightedLinearRegression
-from standardizer import Standardizer
+
+import loess._weightings as wg
+from loess._not_fitted_error import NotFittedError
+from loess.regression import LinearRegression
+from loess.regression import WeightedLinearRegression
+from loess.standardizer import Standardizer
 
 
 class Loess:
@@ -81,6 +82,8 @@ class Loess:
         :param y: The target data as an array.
         :return: The fitted instance of the class.
         """
+        x = np.array(x)
+        y = np.array(y)
         self.nr_points_to_use = int(self.share_of_points * x.shape[0])
         self.fitted_values = np.zeros_like(y)
         if x.ndim < 2:

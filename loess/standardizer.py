@@ -1,6 +1,8 @@
 """Standardize (z-transform) variables."""
 import numpy as np
 
+from loess._not_fitted_error import NotFittedError
+
 
 class Standardizer:
     """Standardize a variable."""
@@ -11,7 +13,12 @@ class Standardizer:
         self.std = None
 
     def _fitted(self):
+        """Return indicator if the Standardizer has been fitted yet."""
         return self.mean is not None
+
+    def _raise_error_if_not_fitted(self):
+        if not self._fitted:
+            raise NotFittedError("The standardizer is not fitted yet.")
 
     def fit(self, x: np.ndarray) -> "Standardizer":
         """Fit the Standardizer, i.e. calculate the mean and the std."""
@@ -23,6 +30,7 @@ class Standardizer:
 
     def transform(self, x: np.ndarray) -> np.ndarray:
         """Use the mean and the std to z-transform the variable."""
+        self._raise_error_if_not_fitted()
         return (x - self.mean) / self.std
 
     def fit_transform(self, x: np.ndarray) -> np.ndarray:
@@ -35,4 +43,5 @@ class Standardizer:
         This means that a z-standardized variable is transformed
             back into the original metric.
         """
+        self._raise_error_if_not_fitted()
         return x * self.std + self.mean

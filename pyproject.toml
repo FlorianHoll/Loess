@@ -7,12 +7,11 @@ authors = ["Florian Holl <florian.holl@triaz.de>"]
 [tool.poetry.dependencies]
 python = "^3.9"
 numpy = "^1.22.4"
-sklearn = "^0.0"
-matplotlib = "^3.5.2"
-pytest = "^7.1.2"
-pandas = "^1.4.2"
 
 [tool.poetry.dev-dependencies]
+sklearn = "^0.0"
+matplotlib = "^3.5.2"
+pandas = "^1.4.2"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
