@@ -52,8 +52,6 @@ Fitting the algorithm to a dataset consists of the following steps:
 
 ## Documentation
 
-### _class_ loess.loess
-
 share_of_points
 weighting
 nr_smoothing_iterations

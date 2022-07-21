@@ -1,21 +1,21 @@
 """Linear Regression implementation in numpy."""
 import numpy as np
 
-from loess._not_fitted_error import NotFittedError
+from local_regression._not_fitted_error import NotFittedError
 
 
 class LinearRegression:
     """Linear Regression.
 
-    The class behaves like the sklearn class, i.e. has the same
-        main methods and properties. The solution is derived
-        analytically and not via an optimization procedure.
+    The class behaves like the sklearn class, i.e. has the same main methods and properties.
+        The solution is derived analytically and not via an optimization procedure.
 
-    :param polynomial_degree: The degree of polynomial to use. All
-        polynomial coefficients smaller than the one indicated will
-         be estimated as well; i.e. if a degree of 4 is specified,
-         the formula is y = ß0 + ß1*x + ß2*x^2 + ß3*x^3 + ß4*x^4.
-         Polynomials will be fitted for each of the predictor columns.
+    :param polynomial_degree: The degree of polynomial to use.
+        All polynomial coefficients smaller than the one indicated will
+        be estimated as well; i.e. if a degree of 3 is specified,
+        the formula is y = ß0 + ß1*x1 + ß2*x1^2 + ß3*x1^3 + ... .
+        Polynomials will be fitted for each of the predictor columns.
+    :param fit_intercept: Fit an intercept? Defaults to True.
     """
 
     def __init__(self, polynomial_degree: int = 1, fit_intercept: bool = True) -> None:
@@ -25,6 +25,18 @@ class LinearRegression:
         self.fit_intercept = fit_intercept
 
     @property
+    def coef_(self):
+        """Obtain the fitted coefficients."""
+        self._raise_error_if_not_fitted()
+        return self.betas[1:]
+
+    @property
+    def intercept_(self):
+        """Obtain the fitted intercept."""
+        self._raise_error_if_not_fitted()
+        return self.betas[0]
+
+    @property
     def fitted(self):
         """Return indicator whether the model has been fitted yet."""
         return self.betas is not None
@@ -32,18 +44,6 @@ class LinearRegression:
     def _raise_error_if_not_fitted(self):
         if not self.fitted:
             raise NotFittedError("The model is not fitted yet.")
-
-    @property
-    def coef_(self):
-        """Get the fitted coefficients."""
-        self._raise_error_if_not_fitted()
-        return self.betas[1:]
-
-    @property
-    def intercept_(self):
-        """Get the fitted intercept."""
-        self._raise_error_if_not_fitted()
-        return self.betas[0]
 
     @staticmethod
     def _add_intercept(X: np.ndarray) -> np.ndarray:
@@ -87,13 +87,23 @@ class LinearRegression:
         return X
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "LinearRegression":
-        """Create the model matrix and solve for the coefficients."""
+        """Create the model matrix and solve for the coefficients.
+
+        :param X: The data as an array (not yet formatted as a model matrix).
+        :param y: The target vector/ array.
+        :return: The fitted instance of the class.
+        """
         X = self._create_model_matrix(X)
         self.betas = self._solve(X, y)
         return self
 
     def predict(self, X: np.ndarray) -> np.ndarray:
-        """Return predictions with the fitted coefficients."""
+        """Return predictions with the fitted coefficients.
+
+        :param X: The data to obtain predictions for as an array
+            (not yet formatted as a model matrix).
+        :return: The predictions for the data points as an array.
+        """
         self._raise_error_if_not_fitted()
         return self._create_model_matrix(X) @ self.betas
 
@@ -102,25 +112,34 @@ class WeightedLinearRegression(LinearRegression):
     """Weighted linear regression.
 
     This is a special case of linear regression that differs in
-        the derivation of the solution in that the model matrix
-        is multiplied with a weight matrix in order to weigh
-        the data points.
-    This is needed for the Loess algorithm where a weighted linear
-        regression is used to obtain the predictions.
+    the derivation of the solution in that the model matrix
+    is multiplied with a weight matrix in order to weigh
+    the data points.
+    The Weighted Linear Regression is needed for the Loess algorithm
+    where a weighted linear regression is used to obtain the predictions.
+
+    NOTE: The properties and methods (including 'predict()') of the
+    base class also work for this class.
     """
 
     def fit(self, X: np.ndarray, W: np.ndarray, y: np.ndarray) -> None:
-        """Create the model matrix and solve for the coefficients."""
+        """Create the model matrix and solve for the coefficients.
+
+        :param X: The data as an array (not yet formatted as a model matrix).
+        :param W: The matrix of weightings to weight each data point with.
+        :param y: The target vector/ array.
+        :return: The fitted instance of the class.
+        """
         X = self._create_model_matrix(X)
-        self.betas = self.solve(X, W, y)
+        self.betas = self._solve(X, W, y)
 
     @staticmethod
-    def solve(X: np.ndarray, W: np.ndarray, y: np.ndarray) -> np.ndarray:
+    def _solve(X: np.ndarray, W: np.ndarray, y: np.ndarray) -> np.ndarray:
         """Estimate the coefficients and return them.
 
         The derivation of the parameters differs from a standard linear
-            regression in that the model matrix is multiplied with a
-            matrix of weights (W) that determines which data points are to
-            be weighted more - or less - in determining the parameters.
+        regression in that the model matrix is multiplied with a
+        matrix of weights (W) that determines which data points are to
+        be weighted more - or less - in the parameter estimation.
         """
         return np.linalg.inv(X.T @ W @ X) @ X.T @ W @ y
