@@ -1,2 +1,2 @@
 """Initialize the loess package."""
-from .loess import *
+from .loess import Loess
