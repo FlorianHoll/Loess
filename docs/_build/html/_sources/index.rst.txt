@@ -3,18 +3,21 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Loess (Locally Weighted Scatterplot Smoothing)'s documentation!
+Loess (Locally Weighted Scatterplot Smoothing) in pure numpy
 ==========================================================================
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+Loess module
+------------------------------
 
-   modules
+.. automodule:: local_regression.loess
+   :members:
+   :undoc-members:
+   :show-inheritance:
 
-Indices and tables
-==================
+Local Regression module
+-----------------------------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+.. automodule:: local_regression.regression
+   :members:
+   :undoc-members:
+   :show-inheritance:

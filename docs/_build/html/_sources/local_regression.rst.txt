@@ -1,16 +1,13 @@
-Loess package
+Loess
 =========================
 
-Loess.loess module
+Loess module
 ------------------------------
 
 .. automodule:: local_regression.loess
    :members:
    :undoc-members:
    :show-inheritance:
-
-Local Regression package
-=========================
 
 Local Regression module
 -----------------------------------

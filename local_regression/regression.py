@@ -119,7 +119,8 @@ class WeightedLinearRegression(LinearRegression):
     where a weighted linear regression is used to obtain the predictions.
 
     NOTE: The properties and methods (including 'predict()') of the
-    base class also work for this class.
+    base class work in exactly the same way for this class; i.e. the
+    weighting is only taken into account to obtain the parameter estimates.
     """
 
     def fit(self, X: np.ndarray, W: np.ndarray, y: np.ndarray) -> None:

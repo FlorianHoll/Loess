@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Welcome to Loess (Locally Weighted Scatterplot Smoothing)’s documentation! &mdash; Loess (Locally Weighted Scatterplot Smoothing) 1.0 documentation</title>
+  <title>Loess (Locally Weighted Scatterplot Smoothing) in pure numpy &mdash; Loess (Locally Weighted Scatterplot Smoothing) 1.0 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <!--[if lt IE 9]>
@@ -19,7 +19,6 @@
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="loess" href="modules.html" />
 </head>
 
 <body class="wy-body-for-nav">
@@ -37,11 +36,15 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">loess</a></li>
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Loess (Locally Weighted Scatterplot Smoothing) in pure numpy</a><ul>
+<li><a class="reference internal" href="#module-local_regression.loess">Loess module</a></li>
+<li><a class="reference internal" href="#module-local_regression.regression">Local Regression module</a></li>
 </ul>
-
+</li>
+</ul>
+</div>
         </div>
       </div>
     </nav>
@@ -56,7 +59,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="#" class="icon icon-home"></a> &raquo;</li>
-      <li>Welcome to Loess (Locally Weighted Scatterplot Smoothing)’s documentation!</li>
+      <li>Loess (Locally Weighted Scatterplot Smoothing) in pure numpy</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
       </li>
@@ -66,34 +69,219 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
 
-  <section id="welcome-to-loess-locally-weighted-scatterplot-smoothing-s-documentation">
-<h1>Welcome to Loess (Locally Weighted Scatterplot Smoothing)’s documentation!<a class="headerlink" href="#welcome-to-loess-locally-weighted-scatterplot-smoothing-s-documentation" title="Permalink to this heading"></a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="modules.html">loess</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="local_regression.html">Loess package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="local_regression.html#local-regression-package">Local Regression package</a></li>
+  <section id="loess-locally-weighted-scatterplot-smoothing-in-pure-numpy">
+<h1>Loess (Locally Weighted Scatterplot Smoothing) in pure numpy<a class="headerlink" href="#loess-locally-weighted-scatterplot-smoothing-in-pure-numpy" title="Permalink to this heading"></a></h1>
+<section id="module-local_regression.loess">
+<span id="loess-module"></span><h2>Loess module<a class="headerlink" href="#module-local_regression.loess" title="Permalink to this heading"></a></h2>
+<p>Implementation of the Loess algorithm.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="local_regression.loess.Loess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">local_regression.loess.</span></span><span class="sig-name descname"><span class="pre">Loess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">share_of_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tricubic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_smoothing_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynomial_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#local_regression.loess.Loess" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implementation of Loess (Locally estimated scatterplot smoothing).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>share_of_points</strong> – Float between 0 and 1. The share of
+points to use for the weighted local linear regressions.
+0.25 = 25% of all points at each time step; 1 = all points
+at each step.</p></li>
+<li><p><strong>weighting</strong> – The weighting to use. Possible options are
+“tricubic”, “linear”, “constant” (although tricubic weighting
+is strongly recommended as this is the originally described
+weighting function in the original paper).</p></li>
+<li><p><strong>nr_smoothing_iterations</strong> – The number of iterations to
+use for smoothing. The algorithm consists of (1.) fitting
+local linear regressions to the data, (2.) (repeatedly)
+re-estimating the points using robust weightings in which
+the influence of outlier points is reduced. See the original
+paper for further information. Defaults to 1, i.e. one fit and
+one smoothing fit to eliminate outliers. Can be arbitrarily
+high, although the higher the number of iterations, the smaller
+the effect of the individual smoothing iteration. Further
+iterations obviously increase the computational cost.</p></li>
+<li><p><strong>polynomial_degree</strong> – The degree with which the local
+regressions are to be fit. Defaults to 2, i.e. a second degree
+polynomial linear regression; another common option is to use 1,
+i.e. ordinary linear regression without polynomial terms.</p></li>
 </ul>
-</li>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.loess.Loess.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#local_regression.loess.Loess" title="local_regression.loess.Loess"><span class="pre">Loess</span></a></span></span><a class="headerlink" href="#local_regression.loess.Loess.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the algorithm to the data.</p>
+<dl class="simple">
+<dt>Fitting the algorithm consists of the following steps:</dt><dd><dl class="simple">
+<dt>1.) fit a local weighted linear regression of degree N for each data point.</dt><dd><p>The prediction of this local linear regression at point p is taken as
+the prediction of the Loess algorithm.</p>
+</dd>
+<dt>2.) The predictions are refined by excluding outliers.</dt><dd><p>The residuals are taken as an indication of outlier values. If a
+data point is an outlier, the fitted value will
+be influenced by the surrounding points, there-
+fore leading to a large residual. Larger residuals
+are now given less weight, in extreme cases 0,
+effectively leading to their elimination.</p>
+</dd>
+<dt>3.) The second step is repeated as long as wished.</dt><dd><p>This leads to an ever smoother and more robust fit.
+However, the additional effect of further iterations becomes
+increasingly smaller as the number of iterations
+increases and, obviously, more iterations are
+computationally expensive.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The data as an array.</p></li>
+<li><p><strong>y</strong> – The target data as an array.</p></li>
 </ul>
-</div>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The fitted instance of the class.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.loess.Loess.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#local_regression.loess.Loess.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict from the fitted algorithm.</p>
+<p>This is done by interpolating the prediction from nearby
+fitted points. The interpolation method used is linear regression
+with the same polynomial degree that the algorithm was fitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – The data for which predictions shall be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </section>
-<section id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this heading"></a></h1>
-<ul class="simple">
-<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
-<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
-<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+<section id="module-local_regression.regression">
+<span id="local-regression-module"></span><h2>Local Regression module<a class="headerlink" href="#module-local_regression.regression" title="Permalink to this heading"></a></h2>
+<p>Linear Regression implementation in numpy.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">local_regression.regression.</span></span><span class="sig-name descname"><span class="pre">LinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polynomial_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#local_regression.regression.LinearRegression" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Linear Regression.</p>
+<dl class="simple">
+<dt>The class behaves like the sklearn class, i.e. has the same main methods and properties.</dt><dd><p>The solution is derived analytically and not via an optimization procedure.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polynomial_degree</strong> – The degree of polynomial to use.
+All polynomial coefficients smaller than the one indicated will
+be estimated as well; i.e. if a degree of 3 is specified,
+the formula is y = ß0 + ß1*x1 + ß2*x1^2 + ß3*x1^3 + … .
+Polynomials will be fitted for each of the predictor columns.</p></li>
+<li><p><strong>fit_intercept</strong> – Fit an intercept? Defaults to True.</p></li>
 </ul>
+</dd>
+</dl>
+<dl class="py property">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression.coef_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">coef_</span></span><a class="headerlink" href="#local_regression.regression.LinearRegression.coef_" title="Permalink to this definition"></a></dt>
+<dd><p>Obtain the fitted coefficients.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#local_regression.regression.LinearRegression" title="local_regression.regression.LinearRegression"><span class="pre">LinearRegression</span></a></span></span><a class="headerlink" href="#local_regression.regression.LinearRegression.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Create the model matrix and solve for the coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – The data as an array (not yet formatted as a model matrix).</p></li>
+<li><p><strong>y</strong> – The target vector/ array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The fitted instance of the class.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression.fitted">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">fitted</span></span><a class="headerlink" href="#local_regression.regression.LinearRegression.fitted" title="Permalink to this definition"></a></dt>
+<dd><p>Return indicator whether the model has been fitted yet.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression.intercept_">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">intercept_</span></span><a class="headerlink" href="#local_regression.regression.LinearRegression.intercept_" title="Permalink to this definition"></a></dt>
+<dd><p>Obtain the fitted intercept.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.regression.LinearRegression.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#local_regression.regression.LinearRegression.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Return predictions with the fitted coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>X</strong> – The data to obtain predictions for as an array
+(not yet formatted as a model matrix).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The predictions for the data points as an array.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="local_regression.regression.WeightedLinearRegression">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">local_regression.regression.</span></span><span class="sig-name descname"><span class="pre">WeightedLinearRegression</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polynomial_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fit_intercept</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#local_regression.regression.WeightedLinearRegression" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#local_regression.regression.LinearRegression" title="local_regression.regression.LinearRegression"><code class="xref py py-class docutils literal notranslate"><span class="pre">LinearRegression</span></code></a></p>
+<p>Weighted linear regression.</p>
+<p>This is a special case of linear regression that differs in
+the derivation of the solution in that the model matrix
+is multiplied with a weight matrix in order to weigh
+the data points.
+The Weighted Linear Regression is needed for the Loess algorithm
+where a weighted linear regression is used to obtain the predictions.</p>
+<p>NOTE: The properties and methods (including ‘predict()’) of the
+base class work in exactly the same way for this class; i.e. the
+weighting is only taken into account to obtain the parameter estimates.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.regression.WeightedLinearRegression.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">X</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">W</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="headerlink" href="#local_regression.regression.WeightedLinearRegression.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Create the model matrix and solve for the coefficients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>X</strong> – The data as an array (not yet formatted as a model matrix).</p></li>
+<li><p><strong>W</strong> – The matrix of weightings to weight each data point with.</p></li>
+<li><p><strong>y</strong> – The target vector/ array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The fitted instance of the class.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
 </section>
 
 
            </div>
           </div>
-          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="modules.html" class="btn btn-neutral float-right" title="loess" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-    </div>
+          <footer>
 
   <hr/>
 
