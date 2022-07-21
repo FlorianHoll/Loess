@@ -4,15 +4,39 @@ from typing import Union
 
 import numpy as np
 
-import loess._weightings as wg
-from loess._not_fitted_error import NotFittedError
-from loess.regression import LinearRegression
-from loess.regression import WeightedLinearRegression
-from loess.standardizer import Standardizer
+import local_regression._weightings as wg
+from local_regression._not_fitted_error import NotFittedError
+from local_regression.regression import LinearRegression
+from local_regression.regression import WeightedLinearRegression
+from local_regression.standardizer import Standardizer
 
 
 class Loess:
-    """Implementation of Loess (Locally estimated scatterplot smoothing)."""
+    """Implementation of Loess (Locally estimated scatterplot smoothing).
+
+    :param share_of_points: Float between 0 and 1. The share of
+        points to use for the weighted local linear regressions.
+        0.25 = 25% of all points at each time step; 1 = all points
+        at each step.
+    :param weighting: The weighting to use. Possible options are
+        "tricubic", "linear", "constant" (although tricubic weighting
+        is strongly recommended as this is the originally described
+        weighting function in the original paper).
+    :param nr_smoothing_iterations: The number of iterations to
+        use for smoothing. The algorithm consists of (1.) fitting
+        local linear regressions to the data, (2.) (repeatedly)
+        re-estimating the points using robust weightings in which
+        the influence of outlier points is reduced. See the original
+        paper for further information. Defaults to 1, i.e. one fit and
+        one smoothing fit to eliminate outliers. Can be arbitrarily
+        high, although the higher the number of iterations, the smaller
+        the effect of the individual smoothing iteration. Further
+        iterations obviously increase the computational cost.
+    :param polynomial_degree: The degree with which the local
+        regressions are to be fit. Defaults to 2, i.e. a second degree
+        polynomial linear regression; another common option is to use 1,
+        i.e. ordinary linear regression without polynomial terms.
+    """
 
     def __init__(
         self,
@@ -21,28 +45,7 @@ class Loess:
         nr_smoothing_iterations: int = 2,
         polynomial_degree: int = 2,
     ) -> None:
-        """Initialize the Loess algorithm.
-
-        :param share_of_points: Float between 0 and 1. The share of
-            points to use for the weighted local linear regressions.
-            0.25 = 25% of all points at each time step; 1 = all points
-            at each step.
-        :param weighting: The weighting to use. Possible options are
-            "tricubic", "linear", "constant". Note: When using constant
-            weighting, this corresponds to KNN regression.
-        :param nr_smoothing_iterations: The number of iterations to
-            use for smoothing. The algorithm consists of (1.) fitting
-            local linear regressions to the data, (2.) (repeatedly)
-            re-estimating the points using robust weightings in which
-            the influence of outlier points is reduced. See the paper
-            for further information. Defaults to 1, i.e. one fit and
-            one smoothing fit to eliminate outliers. Can be arbitrarily
-            high, although more and more iterations will probably not
-            have as big of an effect.
-        :param polynomial_degree: The degree with which the local
-            regressions are to be fit. Defaults to 1; another common
-            option is to use second degree polynomials.
-        """
+        """Initialize the Loess algorithm."""
         self.share_of_points = share_of_points
         self.weighting = weighting
         self.nr_iterations = nr_smoothing_iterations + 1
@@ -60,20 +63,19 @@ class Loess:
         """Fit the algorithm to the data.
 
         Fitting the algorithm consists of the following steps:
-            1.) fit a local weighted linear regression of degree
-                N for each data point. The prediction of this
-                local linear regression at point p is taken as
+            1.) fit a local weighted linear regression of degree N for each data point.
+                The prediction of this local linear regression at point p is taken as
                 the prediction of the Loess algorithm.
-            2.) The predictions are refined; the residuals are
-                taken as an indication of outlier values. If a
+            2.) The predictions are refined by excluding outliers.
+                The residuals are taken as an indication of outlier values. If a
                 data point is an outlier, the fitted value will
                 be influenced by the surrounding points, there-
                 fore leading to a large residual. Larger residuals
                 are now given less weight, in extreme cases 0,
                 effectively leading to their elimination.
-            3.) The second step is repeated as long as wished,
-                leading to an ever more smooth fit. However, the
-                additional effect of further iterations becomes
+            3.) The second step is repeated as long as wished.
+                This leads to an ever smoother and more robust fit.
+                However, the additional effect of further iterations becomes
                 increasingly smaller as the number of iterations
                 increases and, obviously, more iterations are
                 computationally expensive.
@@ -110,11 +112,12 @@ class Loess:
     def predict(self, x: np.ndarray) -> np.ndarray:
         """Predict from the fitted algorithm.
 
-        This has to be done by interpolating the prediction from nearby
-            fitted points. The
+        This is done by interpolating the prediction from nearby
+        fitted points. The interpolation method used is linear regression
+        with the same polynomial degree that the algorithm was fitted.
 
         :param x: The data for which predictions shall be calculated.
-        :return: An array with the predictions.0
+        :return: An array with the predictions.
         """
         self._raise_error_if_not_fitted()
 
