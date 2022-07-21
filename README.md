@@ -14,14 +14,14 @@ poetry install
 ```
 
 
-### The algorithm
+## The algorithm
 Fitting the algorithm to a dataset consists of the following steps:
 1. Fit a local weighted linear regression of degree
    N (controlled with the parameter `polynomial_degree` in the constructor)
    for each data point. One can choose how much of the data
    is considered for this step with the parameter
    `share_of_points` in the constructor. The data points
-   have tricubic weighting (1 - |x|³)³ with bigger weights for nearer
+   have tricubic weighting with bigger weights for nearer
    data points.
    The prediction of this local weighted linear regression at
    point p is taken as the first estimate of the
@@ -41,7 +41,7 @@ Fitting the algorithm to a dataset consists of the following steps:
    increases and, obviously, more iterations are
    computationally expensive.
 
-### Comparison to R's `loess()` function
+## Comparison to R's `loess()` function
 
 | Parameter             | Equivalent in R function    |
 |-----------------------|-----------------------------|
@@ -50,4 +50,14 @@ Fitting the algorithm to a dataset consists of the following steps:
 | `nr_smoothing_iterations` | `iterations` (in `loess.control()`) |
 | `weighting`           | -                           |
 
-### Documentation
+## Documentation
+
+### _class_ loess.loess
+
+share_of_points
+weighting
+nr_smoothing_iterations
+polynomial_degree
+
+
+## Comparison of results with R's `loess()` function
