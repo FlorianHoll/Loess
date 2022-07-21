@@ -4,9 +4,9 @@ from typing import Union
 
 import numpy as np
 
-import loess.weightings as wg
+import loess._weightings as wg
+from loess._not_fitted_error import NotFittedError
 from loess.regression import LinearRegression
-from loess.regression import NotFittedError
 from loess.regression import WeightedLinearRegression
 from loess.standardizer import Standardizer
 
