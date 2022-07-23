@@ -1,7 +1,7 @@
 """Standardize (z-transform) variables."""
 import numpy as np
 
-from local_regression._not_fitted_error import NotFittedError
+from loess._not_fitted_error import NotFittedError
 
 
 class Standardizer:

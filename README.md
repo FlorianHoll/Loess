@@ -3,14 +3,19 @@
 This is an implementation of the loess algorithm in Python using only `numpy`.
 The algorithm is introduced and described in detail in [Cleveland (1979)](https://sites.stat.washington.edu/courses/stat527/s14/readings/Cleveland_JASA_1979.pdf).
 
-Clone the repo:
+Install the package in your project:
 ```bash
-git clone https://github.com/FlorianHoll/Lowess.git
+poetry install git+https://github.com/FlorianHoll/Loess.git
 ```
 
-Use the poetry environment:
-```bash
-poetry install
+Usage:
+```python
+from loess import Loess
+
+model = Loess()
+model.fit(x, y)  # fit the model
+predictions = model.fitted_values  # obtain predictions for fitted data
+new_predictions = model.predict(new_x)  # predictions for new data
 ```
 
 ## The algorithm
