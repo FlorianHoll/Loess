@@ -1,0 +1,7 @@
+Standardizer module
+------------------------------
+
+.. automodule:: local_regression.standardizer
+   :members:
+   :undoc-members:
+   :show-inheritance:

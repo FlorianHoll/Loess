@@ -1,0 +1,7 @@
+Loess module
+------------------------------
+
+.. automodule:: local_regression.loess
+   :members:
+   :undoc-members:
+   :show-inheritance:

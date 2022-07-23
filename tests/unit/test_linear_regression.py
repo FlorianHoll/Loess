@@ -11,6 +11,11 @@ class TestLinearRegression:
 
     @staticmethod
     def test_linear_regression_recognizes_pattern():
+        """
+        GIVEN some data and a target
+        WHEN a linear regression is fit
+        THEN the results should match the sklearn results.
+        """
         x = np.random.normal(size=50)
         y = 3 + 2 * x
         model = LinearRegression()
@@ -20,6 +25,11 @@ class TestLinearRegression:
 
     @staticmethod
     def test_results_match_sklearn():
+        """
+        GIVEN some data and a target
+        WHEN a linear regression is fit
+        THEN the results should match the sklearn results.
+        """
         x = np.random.normal(size=50)
         y = np.random.normal(size=50)
         model = LinearRegression()

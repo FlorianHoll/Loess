@@ -1,0 +1,18 @@
+.. Loess (Locally Weighted Scatterplot Smoothing) documentation master file, created by
+   sphinx-quickstart on Thu Jul 21 08:02:38 2022.
+   You can adapt this file completely to your liking, but it should at least
+   contain the root `toctree` directive.
+
+Loess (Locally Weighted Scatterplot Smoothing)
+==========================================================================
+
+This is an implementation of the Loess algorithm in pure numpy.
+The algorithm is introduced and described in `Cleveland (1979) <https://sites.stat.washington.edu/courses/stat527/s14/readings/Cleveland_JASA_1979.pdf>`_
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Contents:
+
+   Loess
+   Regression
+   Standardizer

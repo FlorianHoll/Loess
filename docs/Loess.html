@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Loess module &mdash; Loess (Locally Weighted Scatterplot Smoothing) 1.0 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Local Regression module" href="Regression.html" />
+    <link rel="prev" title="Loess (Locally Weighted Scatterplot Smoothing)" href="index.html" />
+</head>
+
+<body class="wy-body-for-nav">
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> Loess (Locally Weighted Scatterplot Smoothing)
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Loess module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Regression.html">Local Regression module</a></li>
+<li class="toctree-l1"><a class="reference internal" href="Standardizer.html">Standardizer module</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Loess (Locally Weighted Scatterplot Smoothing)</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Loess module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/Loess.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+
+  <section id="module-local_regression.loess">
+<span id="loess-module"></span><h1>Loess module<a class="headerlink" href="#module-local_regression.loess" title="Permalink to this heading"></a></h1>
+<p>Implementation of the Loess algorithm.</p>
+<p>The Loess (Locally estimated scatterplot smoothing) algorithm
+is a nonparametric modeling approach which can be used in the
+presence of strong nonlinearity. The present implementation is
+capable of fitting the data points and furthermore - in contrast
+to the scipy implementation - capable of interpolating for new
+data points.</p>
+<p>The algorithm works by fitting weighted local regressions for
+each point in the data and then refining this first prediction
+by excluding outliers from the fit for as many iterations as
+wished. See the <cite>fit()</cite> section for more details.</p>
+<p>The result is a smooth, nonparametric fit the data.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="local_regression.loess.Loess">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">local_regression.loess.</span></span><span class="sig-name descname"><span class="pre">Loess</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">share_of_points</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">float</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0.75</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighting</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'tricubic'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">nr_smoothing_iterations</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polynomial_degree</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">2</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#local_regression.loess.Loess" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Implementation of Loess (Locally estimated scatterplot smoothing).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>share_of_points</strong> – Float between 0 and 1. The share of
+points to use for the weighted local linear regressions.
+0.25 = 25% of all points at each time step; 1 = all points
+at each step.</p></li>
+<li><p><strong>weighting</strong> – The weighting to use. Possible options are
+“tricubic”, “linear”, “constant” (although tricubic weighting
+is strongly recommended as this is the originally described
+weighting function in the original paper).</p></li>
+<li><p><strong>nr_smoothing_iterations</strong> – The number of iterations to
+use for smoothing. The algorithm consists of (1.) fitting
+local linear regressions to the data, (2.) (repeatedly)
+re-estimating the points using robust weightings in which
+the influence of outlier points is reduced. See the original
+paper for further information. Defaults to 1, i.e. one fit and
+one smoothing fit to eliminate outliers. Can be arbitrarily
+high, although the higher the number of iterations, the smaller
+the effect of the individual smoothing iteration. Further
+iterations obviously increase the computational cost.</p></li>
+<li><p><strong>polynomial_degree</strong> – The degree with which the local
+regressions are to be fit. Defaults to 2, i.e. a second degree
+polynomial linear regression; another common option is to use 1,
+i.e. ordinary linear regression without polynomial terms.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.loess.Loess.fit">
+<span class="sig-name descname"><span class="pre">fit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#local_regression.loess.Loess" title="local_regression.loess.Loess"><span class="pre">Loess</span></a></span></span><a class="headerlink" href="#local_regression.loess.Loess.fit" title="Permalink to this definition"></a></dt>
+<dd><p>Fit the algorithm to the data.</p>
+<dl class="simple">
+<dt>Fitting the algorithm consists of the following steps:</dt><dd><dl class="simple">
+<dt>1.) fit a local weighted linear regression of degree N for each data point.</dt><dd><p>The prediction of this local linear regression at point p is taken as
+the prediction of the Loess algorithm.</p>
+</dd>
+<dt>2.) The predictions are refined by excluding outliers.</dt><dd><p>The residuals are taken as an indication of outlier values. If a
+data point is an outlier, the fitted value will
+be influenced by the surrounding points, there-
+fore leading to a large residual. Larger residuals
+are now given less weight, in extreme cases 0,
+effectively leading to their elimination.</p>
+</dd>
+<dt>3.) The second step is repeated as long as wished.</dt><dd><p>This leads to an ever smoother and more robust fit.
+However, the additional effect of further iterations becomes
+increasingly smaller as the number of iterations
+increases and, obviously, more iterations are
+computationally expensive.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>x</strong> – The data as an array.</p></li>
+<li><p><strong>y</strong> – The target data as an array.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The fitted instance of the class.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="local_regression.loess.Loess.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">ndarray</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">ndarray</span></span></span><a class="headerlink" href="#local_regression.loess.Loess.predict" title="Permalink to this definition"></a></dt>
+<dd><p>Predict from the fitted algorithm.</p>
+<p>This is done by interpolating the prediction from nearby
+fitted points. The interpolation method used is linear regression
+with the same polynomial degree that the algorithm was fitted.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>x</strong> – The data for which predictions shall be calculated.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An array with the predictions.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Loess (Locally Weighted Scatterplot Smoothing)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="Regression.html" class="btn btn-neutral float-right" title="Local Regression module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Florian Holl.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+</body>
+</html>
