@@ -61,6 +61,9 @@ Fitting the algorithm to a dataset consists of the following steps:
 | Parameter             | Equivalent in R function    |
 |-----------------------|-----------------------------|
 | ![python_results1](./tests/test_against_r/images/python_1.png?)  | ![R_results1](./tests/test_against_r/images/r_1.png?)  |
+| ![python_results1](./tests/test_against_r/images/python_2.png?)  | ![R_results1](./tests/test_against_r/images/r_2.png?)  |
+| ![python_results1](./tests/test_against_r/images/python_3.png?)  | ![R_results1](./tests/test_against_r/images/r_3.png?)  |
+| ![python_results1](./tests/test_against_r/images/python_4.png?)  | ![R_results1](./tests/test_against_r/images/r_4.png?)  |
 
 **Python**
 ```python
