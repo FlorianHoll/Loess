@@ -2,5 +2,6 @@
 .pytest_cache/
 __pycache__/
 sphinx/
+tests/test_against_r/.ipynb_checkpoints/
 
 *.csv
