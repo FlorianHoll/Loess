@@ -55,13 +55,14 @@ Fitting the algorithm to a dataset consists of the following steps:
 | `weighting`           | -                           |
 
 ## Comparison of results with R's `loess()` function
-Note: Minor deviations may result from different hyperparameters - the R documentation of `loess()` is not
-explicit about some of the hyperparameters.
-
-
-### Prestige dataset
-Each of the fits below was fitted with the same settings with the built-in `loess()` function in R
+Each of the fits below was fitted on the R dataset `Prestige`
+with the same settings with the built-in `loess()` function in R
 and with the present package in Python.
+Note: Minor deviations may result from different hyperparameters - the
+R documentation of `loess()` is not explicit about some of the hyperparameters -
+and differing interpolation methods (the R documentation is not particularly explicit
+about the interpolation method used).
+
 
 | Fit in Python: `Loess().fit()`            | Fit in R: `loess()` |
 |-----------------------|-----------------------------|
