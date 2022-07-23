@@ -3,12 +3,12 @@
 This is an implementation of the loess algorithm in Python using only `numpy`.
 The algorithm is introduced and described in detail in [Cleveland (1979)](https://sites.stat.washington.edu/courses/stat527/s14/readings/Cleveland_JASA_1979.pdf).
 
-Install the package in your project:
+### Install the package in your project:
 ```bash
 poetry install git+https://github.com/FlorianHoll/Loess.git
 ```
 
-Usage:
+### Usage:
 ```python
 from loess import Loess
 
@@ -18,18 +18,17 @@ predictions = model.fitted_values  # obtain predictions for the fitted data
 new_predictions = model.predict(new_x)  # predictions for new data
 ```
 
+See the [docs](https://florianholl.github.io/Loess/Loess.html) for further information.
+
 ## The algorithm
 Fitting the algorithm to a dataset consists of the following steps:
 1. Fit a local weighted linear regression of degree
-   N (controlled with the parameter `polynomial_degree` in the constructor)
-   for each data point. One can choose how much of the data
-   is considered for this step with the parameter
-   `share_of_points` in the constructor. The data points
-   have tricubic weighting with bigger weights for nearer
-   data points.
+   N for each data point in which only a certain percentage of the overall
+   data points is considered. The data points have tricubic weighting with
+   bigger weights for nearer data points.
    The prediction of this local weighted linear regression at
-   point p is taken as the first estimate of the
-   prediction of the Loess algorithm.
+   each point is taken as the first estimate of the
+   prediction of the Loess algorithm for this point.
 2. The predictions are then refined: The residuals of the
    fitted values are taken as an indication of outlier
    values (see first three equations on page 831 of the original paper).
