@@ -55,23 +55,17 @@ Fitting the algorithm to a dataset consists of the following steps:
 | `weighting`           | -                           |
 
 ## Comparison of results with R's `loess()` function
+Note: Minor deviations may result from different hyperparameters - the R documentation of `loess()` is not
+explicit about some of the hyperparameters.
+
 
 ### Prestige dataset
+Each of the fits below was fitted with the same settings with the built-in `loess()` function in R
+and with the present package in Python.
 
-| Parameter             | Equivalent in R function    |
+| Fit in Python: `Loess().fit()`            | Fit in R: `loess()` |
 |-----------------------|-----------------------------|
 | ![python_results1](./tests/test_against_r/images/python_1.png?)  | ![R_results1](./tests/test_against_r/images/r_1.png?)  |
 | ![python_results1](./tests/test_against_r/images/python_2.png?)  | ![R_results1](./tests/test_against_r/images/r_2.png?)  |
 | ![python_results1](./tests/test_against_r/images/python_3.png?)  | ![R_results1](./tests/test_against_r/images/r_3.png?)  |
 | ![python_results1](./tests/test_against_r/images/python_4.png?)  | ![R_results1](./tests/test_against_r/images/r_4.png?)  |
-
-**Python**
-```python
-Loess(polynomial_degree=2, share_of_points=.75).fit(
-   prestige["income"], prestige["prestige"]
-)
-```
-
-
-![python_results1](./tests/test_against_r/images/python_1.png? "Python results for loess with the prestige dataset.")
-![R_results1](./tests/test_against_r/images/r_1.png?raw=true "R results for loess with the prestige dataset.")
