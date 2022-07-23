@@ -58,6 +58,10 @@ Fitting the algorithm to a dataset consists of the following steps:
 
 ### Prestige dataset
 
+| Parameter             | Equivalent in R function    |
+|-----------------------|-----------------------------|
+| ![python_results1](./tests/test_against_r/images/python_1.png?)  | ![R_results1](./tests/test_against_r/images/r_1.png?)  |
+
 **Python**
 ```python
 Loess(polynomial_degree=2, share_of_points=.75).fit(
