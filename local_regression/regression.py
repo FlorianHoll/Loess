@@ -1,4 +1,8 @@
-"""Linear Regression implementation in numpy."""
+"""Linear Regression implementation in numpy.
+
+Loess depends on weighted local linear regression, therefore this
+algorithm is needed to implement Loess as well.
+"""
 import numpy as np
 
 from local_regression._not_fitted_error import NotFittedError
@@ -25,23 +29,23 @@ class LinearRegression:
         self.fit_intercept = fit_intercept
 
     @property
-    def coef_(self):
+    def coef_(self) -> np.ndarray:
         """Obtain the fitted coefficients."""
         self._raise_error_if_not_fitted()
         return self.betas[1:]
 
     @property
-    def intercept_(self):
+    def intercept_(self) -> float:
         """Obtain the fitted intercept."""
         self._raise_error_if_not_fitted()
         return self.betas[0]
 
     @property
-    def fitted(self):
+    def fitted(self) -> bool:
         """Return indicator whether the model has been fitted yet."""
         return self.betas is not None
 
-    def _raise_error_if_not_fitted(self):
+    def _raise_error_if_not_fitted(self) -> None:
         if not self.fitted:
             raise NotFittedError("The model is not fitted yet.")
 
@@ -123,7 +127,9 @@ class WeightedLinearRegression(LinearRegression):
     weighting is only taken into account to obtain the parameter estimates.
     """
 
-    def fit(self, X: np.ndarray, W: np.ndarray, y: np.ndarray) -> None:
+    def fit(
+        self, X: np.ndarray, W: np.ndarray, y: np.ndarray
+    ) -> "WeightedLinearRegression":
         """Create the model matrix and solve for the coefficients.
 
         :param X: The data as an array (not yet formatted as a model matrix).
@@ -133,6 +139,7 @@ class WeightedLinearRegression(LinearRegression):
         """
         X = self._create_model_matrix(X)
         self.betas = self._solve(X, W, y)
+        return self
 
     @staticmethod
     def _solve(X: np.ndarray, W: np.ndarray, y: np.ndarray) -> np.ndarray:
