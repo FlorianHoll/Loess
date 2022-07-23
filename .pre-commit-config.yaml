@@ -43,7 +43,7 @@ repos:
               "--fail-under=9.0",
               "--disable=import-error,wrong-import-order"
           ]
-        exclude: "docs/"
+        exclude: "sphinx/"
   - repo: https://github.com/pycqa/pydocstyle # Test all docstrings for correct syntax.
     rev: 6.1.1
     hooks:

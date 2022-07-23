@@ -1,4 +1,19 @@
-"""Implementation of the Loess algorithm."""
+"""Implementation of the Loess algorithm.
+
+The Loess (Locally estimated scatterplot smoothing) algorithm
+is a nonparametric modeling approach which can be used in the
+presence of strong nonlinearity. The present implementation is
+capable of fitting the data points and furthermore - in contrast
+to the scipy implementation - capable of interpolating for new
+data points.
+
+The algorithm works by fitting weighted local regressions for
+each point in the data and then refining this first prediction
+by excluding outliers from the fit for as many iterations as
+wished. See the `fit()` section for more details.
+
+The result is a smooth, nonparametric fit the data.
+"""
 from typing import List
 from typing import Union
 
@@ -87,10 +102,13 @@ class Loess:
         x = np.array(x)
         y = np.array(y)
         self.nr_points_to_use = int(self.share_of_points * x.shape[0])
-        self.fitted_values = np.zeros_like(y)
         if x.ndim < 2:
             x = x.reshape(-1, 1)
         self.x = x
+
+        # Similarly to R, we also want a 'fitted values' attribute
+        #   containing the fitted values for the data.
+        self.fitted_values = np.zeros_like(y)
 
         for iteration in range(self.nr_iterations):
             if iteration == 0:
@@ -156,10 +174,10 @@ class Loess:
     def _interpolate(self, point: np.ndarray) -> np.ndarray:
         """Interpolate and return the prediction.
 
-        For the interpolation, the M closest points are used. The
-            interpolation method used is interpolating with a Linear
-            Regression with a polynomial degree equal to the polynomial
-            degree of the Loess instance.
+        For the interpolation, the N closest points are used. The
+        interpolation method used is interpolating with a Linear
+        Regression with a polynomial degree equal to the polynomial
+        degree of the Loess instance.
 
         :param point: The point for which a prediction shall be interpolated.
         :return: The prediction.
@@ -168,14 +186,17 @@ class Loess:
         #    can be given; therefore, a NaN is returned.
         if np.any(point < self.x.min(axis=0)) or np.any(point > self.x.max(axis=0)):
             print(
-                f"Warning: Value {point} to be predicted "
-                f"is outside the fitted region. Returning NaN."
+                f"Warning: Value {point} is outside the fitted region. "
+                f"No sensible prediction is possible. Returning NaN."
             )
             return np.nan
         distances = self._get_distances_to_point(self.x, point, normalize=True)
         points_to_use = self._choose_points(distances, self.nr_points_to_use)
         local_x = self.x[points_to_use]
         local_y = self.predict(local_x)
+        # Fit a linear regression to the local data points and predict
+        #   the value for the given point. This prediction is the
+        #   interpolated value.
         return (
             LinearRegression(polynomial_degree=self.polynomial_degree)
             .fit(local_x, local_y)
@@ -186,21 +207,26 @@ class Loess:
     def _get_robust_weightings(y_pred: np.ndarray, y_true: np.ndarray) -> np.ndarray:
         """Calculate robust weightings to eliminate the effect of outliers.
 
-        The formula to do this is taken from Cleveland (1979).
+        Bisquare weighting is used, as proposed in Cleveland (1979).
         """
         residuals = np.abs(y_true.flatten() - y_pred.flatten())
         weightings = wg.bisquare(residuals / (6 * np.median(residuals)))
         return weightings
 
     def _weigh_points(self, distances: np.ndarray, max_distance: float) -> np.ndarray:
-        """Weigh points and return a weighting matrix."""
+        """Weigh points and return a weighting matrix.
+
+        Since the weighting functions need the distances to be <= 1,
+        they are scaled by the maximum present distance to ensure that
+        all points meet this requirement.
+        """
         weighter = getattr(wg, self.weighting)
         scaled_distances = distances / max_distance
         weightings = weighter(scaled_distances)
         return np.diag(weightings)
 
     @staticmethod
-    def _choose_points(distances: np.ndarray, nr_points: int) -> List[np.ndarray]:
+    def _choose_points(distances: np.ndarray, nr_points: int) -> np.ndarray:
         """Sort the distances and return the N closest points."""
         return np.argsort(distances)[:nr_points]
 
@@ -208,7 +234,11 @@ class Loess:
     def _get_distances_to_point(
         x: np.ndarray, point: np.ndarray, normalize: bool = False
     ) -> np.ndarray:
-        """Calculate euclidean distance and return vector of distances."""
+        """Calculate Euclidean distance and return vector of distances.
+
+        In higher-dimensional cases, scaling is needed to get sensible
+        Euclidean distances.
+        """
         if normalize:
             standardizer = Standardizer()
             x = standardizer.fit_transform(x)
@@ -220,9 +250,9 @@ class Loess:
     ) -> None:
         """Fit a local polynomial regression for each point.
 
-        :param x: The whole data to be iterated through.
+        :param x: The data to fit that will be iterated through.
         :param w: The robust weightings. During the first iteration,
-            the weightings are all 1, i.e. no weighting. During
+            the weightings are all ones, i.e. no weighting. During
             subsequent iterations, the robust weightings are calcu-
             lated based on the residuals.
         :param y: The target data.
@@ -244,18 +274,17 @@ class Loess:
             #   iterations, the weights are all ones. The weightings, on
             #   the other hand, are given by the chosen weighting function.
             #   The most commonly chosen weighting function (and the default
-            #   here) is the tricube function.
+            #   here) is the tricube function. Both are combined to obtain
+            #   the weighting matrix for the weighted local linear regression.
             robust_weights = np.diag(local_w)
             weightings = self._weigh_points(local_distances, local_distances.max())
             combined_robust_weightings = robust_weights * weightings
 
-            # Fit the weighted linear regression on the local data.
-            local_weighted_regression = WeightedLinearRegression(
-                polynomial_degree=self.polynomial_degree
+            # Fit the weighted linear regression on the local data and obtain
+            #   the prediction for the current data point.
+            current_point = (
+                WeightedLinearRegression(polynomial_degree=self.polynomial_degree)
+                .fit(local_x, combined_robust_weightings, local_y)
+                .predict(point.reshape(1, -1))
             )
-            local_weighted_regression.fit(local_x, combined_robust_weightings, local_y)
-
-            # Add the prediction of the regression as the prediction for
-            #   the current data point.
-            current_point = local_weighted_regression.predict(point.reshape(1, -1))
             self.fitted_values[position] = current_point
