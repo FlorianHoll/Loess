@@ -13,8 +13,8 @@ Usage:
 from loess import Loess
 
 model = Loess()
-model.fit(x, y)  # fit the model
-predictions = model.fitted_values  # obtain predictions for fitted data
+model.fit(x, y)  # fit the algorithm to the data
+predictions = model.fitted_values  # obtain predictions for the fitted data
 new_predictions = model.predict(new_x)  # predictions for new data
 ```
 
@@ -56,15 +56,15 @@ Fitting the algorithm to a dataset consists of the following steps:
 
 ## Comparison of results with R's `loess()` function
 
-**Prestige dataset:**
+### Prestige dataset
 
-| Parameter             | Equivalent in R function    |
-|-----------------------|-----------------------------|
-| ![R_results1](./tests/test_against_r/images/r_loess_education_prestige.png?raw=true "R results for loess with the prestige dataset.")   | ![python_results1](./tests/test_against_r/images/python_loess_education_prestige.png?raw=true "R results for loess with the prestige dataset.")                  |
-| `share_of_points`     | `span`                      |
-| `nr_smoothing_iterations` | `iterations` (in `loess.control()`) |
-| `weighting`           | -                           |
+**Python**
+```python
+Loess(polynomial_degree=2, share_of_points=.75).fit(
+   prestige["income"], prestige["prestige"]
+)
+```
 
 
-
-![R_results1](./tests/test_against_r/images/r_loess_education_prestige.png?raw=true "R results for loess with the prestige dataset.")
+![python_results1](./tests/test_against_r/images/python_1.png? "Python results for loess with the prestige dataset.")
+![R_results1](./tests/test_against_r/images/r_1.png?raw=true "R results for loess with the prestige dataset.")
