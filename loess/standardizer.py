@@ -8,7 +8,7 @@ to be able to calculate sensible Euclidean distances.
 """
 import numpy as np
 
-from local_regression._not_fitted_error import NotFittedError
+from loess._not_fitted_error import NotFittedError
 
 
 class Standardizer:
