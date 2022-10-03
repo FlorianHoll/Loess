@@ -29,6 +29,20 @@ class LinearRegression:
         self.fit_intercept = fit_intercept
 
     @property
+    def fitted(self) -> bool:
+        """Return indicator whether the model has been fitted yet.
+
+        Since the betas (the coefficients) are initialized as None
+        and are only set to actual values after the model has been
+        fitted, they are used to indicate if the model has been fitted.
+        """
+        return self.betas is not None
+
+    def _raise_error_if_not_fitted(self) -> None:
+        if not self.fitted:
+            raise NotFittedError("The model is not fitted yet.")
+
+    @property
     def coef_(self) -> np.ndarray:
         """Obtain the fitted coefficients."""
         self._raise_error_if_not_fitted()
@@ -39,15 +53,6 @@ class LinearRegression:
         """Obtain the fitted intercept."""
         self._raise_error_if_not_fitted()
         return self.betas[0]
-
-    @property
-    def fitted(self) -> bool:
-        """Return indicator whether the model has been fitted yet."""
-        return self.betas is not None
-
-    def _raise_error_if_not_fitted(self) -> None:
-        if not self.fitted:
-            raise NotFittedError("The model is not fitted yet.")
 
     @staticmethod
     def _add_intercept(X: np.ndarray) -> np.ndarray:
@@ -75,11 +80,6 @@ class LinearRegression:
             X = np.c_[X, np.power(X[:, :nr_features], polynomial)]
         return X
 
-    @staticmethod
-    def _solve(X: np.ndarray, y: np.ndarray) -> np.ndarray:
-        """Estimate the coefficients and return them."""
-        return np.linalg.inv(X.T @ X) @ X.T @ y
-
     def _create_model_matrix(self, X: np.ndarray) -> np.ndarray:
         """Create and return the model matrix."""
         if X.ndim < 2:
@@ -89,6 +89,11 @@ class LinearRegression:
         if self.fit_intercept:
             X = self._add_intercept(X)
         return X
+
+    @staticmethod
+    def _solve(X: np.ndarray, y: np.ndarray) -> np.ndarray:
+        """Estimate the coefficients and return them."""
+        return np.linalg.inv(X.T @ X) @ X.T @ y
 
     def fit(self, X: np.ndarray, y: np.ndarray) -> "LinearRegression":
         """Create the model matrix and solve for the coefficients.
