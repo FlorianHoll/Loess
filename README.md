@@ -6,12 +6,12 @@ in Python using only `numpy`.
 The algorithm, introduced and described in detail in
 [Cleveland (1979)](https://sites.stat.washington.edu/courses/stat527/s14/readings/Cleveland_JASA_1979.pdf),
 is a nonparametric statistical modeling approach which can be used in the presence
-of strong nonlinearity.
+of strong nonlinearity in the data.
 
 The `scipy` implementation of LOESS lacks the ability to interpolate to data points
 which where not part of the training data. The present implementation handles
-this problems and implements a `predict()` function which can interpolate to not
-seen data points.
+this problem and implements a `predict()` function which can interpolate to
+data points that were not seen before.
 
 ### Install the package in your project:
 ```bash
