@@ -92,7 +92,7 @@ the robust weighting matrix.
 ### (Weighted) Linear regression
 Since the algorithm builds on the linear regression framework, the package
 also contains linear regression and weighted linear regression as by-products.
-These work exactly like `scikit-learn` models.
+These behave exactly like `scikit-learn` models.
 
 ```python
 from loess.regression import LinearRegression
@@ -100,12 +100,13 @@ from loess.regression import WeightedLinearRegression
 
 model = LinearRegression()
 model.fit(x, y)
-model.betas  # obtain the estimates for the coefficients.
+model.coef_  # as in sklearn; obtain the estimates for the coefficients.
+model.intercept_  # obtain the estimates for the intercept.
 model.predict(new_x)
 
 weighted_model = WeightedLinearRegression()
 weighted_model.fit(x, w, y)  # w is the weighting matrix.
-model.betas
+model.coef_
 # For the prediction, no weighting is needed since the weighting
 #   is only used for the estimation of the coefficients.
 weighted_model.predict(new_x)
