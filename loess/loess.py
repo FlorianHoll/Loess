@@ -74,7 +74,7 @@ class Loess:
         if not self.fitted:
             raise NotFittedError("The model is not fitted yet.")
 
-    def fit(self, x: np.ndarray, y: np.ndarray) -> "Loess":
+    def fit(self, x: np.ndarray, y: np.ndarray, raise_errors: bool = False) -> "Loess":
         """Fit the algorithm to the data.
 
         Fitting the algorithm consists of the following steps:
@@ -98,6 +98,12 @@ class Loess:
 
         :param x: The data as an array.
         :param y: The target data as an array.
+        :param raise_errors: Whether or not to raise errors when a singular
+            matrix occurs. This can occur when the share of points is set too
+            low and there are strong outliers clustered around specific x
+            values. If set to True, the algorithm will raise an error if
+            this occurs; if set to False (default), it will ignore the weighting
+            matrix for this point and warn the user to increase the share of points.
         :return: The fitted instance of the class.
         """
         x = np.array(x)
@@ -123,7 +129,9 @@ class Loess:
                 robust_weightings = self._get_robust_weightings(self.fitted_values, y)
 
             # Fit a local regression for each point, weighted with the weight matrix.
-            self._fit_local_regression_for_all_points(x, robust_weightings, y)
+            self._fit_local_regression_for_all_points(
+                x, robust_weightings, y, raise_errors
+            )
 
         self.fitted = True
         return self
@@ -147,7 +155,7 @@ class Loess:
         return np.array(predictions)
 
     def _fit_local_regression_for_all_points(
-        self, x: np.ndarray, w: np.ndarray, y: np.ndarray
+        self, x: np.ndarray, w: np.ndarray, y: np.ndarray, raise_errors: bool
     ) -> None:
         """Fit a local polynomial regression for all points.
 
@@ -166,6 +174,8 @@ class Loess:
             local_x, local_y, local_w, local_distances = [
                 arr[points_to_use] for arr in [x, y, w, distances]
             ]
+            if not raise_errors:
+                local_w = self._check_robust_weightings(local_w, point)
 
             # Calculate the weights for the weighted linear regression.
             #   The robust weights are given by the residuals; in the first
@@ -180,12 +190,19 @@ class Loess:
 
             # Fit the weighted linear regression on the local data and obtain
             #   the prediction for the current data point.
-            current_point = (
-                WeightedLinearRegression(polynomial_degree=self.polynomial_degree)
-                .fit(local_x, combined_robust_weightings, local_y)
-                .predict(point.reshape(1, -1))
-            )
-            self.fitted_values[position] = current_point
+            try:
+                current_point = (
+                    WeightedLinearRegression(polynomial_degree=self.polynomial_degree)
+                    .fit(local_x, combined_robust_weightings, local_y)
+                    .predict(point.reshape(1, -1))
+                )
+                self.fitted_values[position] = current_point
+            except np.linalg.LinAlgError:
+                raise ValueError(
+                    "A singular matrix error occurred. This is because of too few "
+                    "data points and strong outliers around some specific x values. \n"
+                    "Increase the share of points to avoid this."
+                )
 
     def _predict_one_point(self, point: Union[np.ndarray, float]) -> np.ndarray:
         """Calculate a prediction for a single point.
@@ -283,3 +300,32 @@ class Loess:
             x = standardizer.fit_transform(x)
             point = standardizer.transform(point)
         return np.linalg.norm(point - x, axis=1)
+
+    @staticmethod
+    def _check_robust_weightings(local_w: np.ndarray, x_value: float):
+        """Check if the robust weightings are sufficiently large.
+
+        In same cases (e.g. temporal data), it might happen that at a specific
+        point, a lot of points are classified as outliers based on the residuals,
+        therefore leading to very low weights. However, the coefficient estimation
+        cannot be done with a singular matrix. Therefore, if the weightings
+        are too small, they are replaced by ones so that they are not weighted
+        at all.
+
+        :param local_w: The weightings of the local points that will be
+            handed to the weighted local linear regression.
+        :param x_value: The value of x that the weightings are calculated for.
+        :return: If the weightings are too small and would result in a
+            singular matrix, all weights are set to 0 to avoid an error.
+            If not, the weightings are returned as they are.
+        """
+        if np.sum(local_w) < (len(local_w) * 1e-3):
+            warnings.warn(
+                "The local weightings are so small that they would lead to a "
+                "singular matrix. Setting all weights to 1 to avoid error. \n"
+                f"Check the values around x = {x_value}. \n"
+                "To avoid this warning, set the share of points higher, i.e. "
+                "use more data points in the local weighted regression."
+            )
+            return np.ones_like(local_w)
+        return local_w
