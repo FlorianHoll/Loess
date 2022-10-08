@@ -14,7 +14,7 @@ wished. See the `fit()` section for more details.
 
 The result is a smooth, nonparametric fit the data.
 """
-from typing import List
+import warnings
 from typing import Union
 
 import numpy as np
@@ -74,29 +74,36 @@ class Loess:
         if not self.fitted:
             raise NotFittedError("The model is not fitted yet.")
 
-    def fit(self, x: np.ndarray, y: np.ndarray) -> "Loess":
+    def fit(self, x: np.ndarray, y: np.ndarray, raise_errors: bool = False) -> "Loess":
         """Fit the algorithm to the data.
 
         Fitting the algorithm consists of the following steps:
-            1.) fit a local weighted linear regression of degree N for each data point.
-                The prediction of this local linear regression at point p is taken as
-                the prediction of the Loess algorithm.
+            1.) fit a local weighted linear regression of degree N for
+                each data point. The prediction of this local linear
+                regression at point p is taken as the prediction of the
+                Loess algorithm.
             2.) The predictions are refined by excluding outliers.
-                The residuals are taken as an indication of outlier values. If a
-                data point is an outlier, the fitted value will
-                be influenced by the surrounding points, there-
-                fore leading to a large residual. Larger residuals
+                The residuals are taken as an indication of outlier
+                values. If a data point is an outlier, the fitted
+                value will be influenced by the surrounding points,
+                therefore leading to a large residual. Larger residuals
                 are now given less weight, in extreme cases 0,
                 effectively leading to their elimination.
             3.) The second step is repeated as long as wished.
                 This leads to an ever smoother and more robust fit.
-                However, the additional effect of further iterations becomes
-                increasingly smaller as the number of iterations
+                However, the additional effect of further iterations
+                becomes increasingly smaller as the number of iterations
                 increases and, obviously, more iterations are
                 computationally expensive.
 
         :param x: The data as an array.
         :param y: The target data as an array.
+        :param raise_errors: Whether or not to raise errors when a singular
+            matrix occurs. This can occur when the share of points is set too
+            low and there are strong outliers clustered around specific x
+            values. If set to True, the algorithm will raise an error if
+            this occurs; if set to False (default), it will ignore the weighting
+            matrix for this point and warn the user to increase the share of points.
         :return: The fitted instance of the class.
         """
         x = np.array(x)
@@ -122,7 +129,9 @@ class Loess:
                 robust_weightings = self._get_robust_weightings(self.fitted_values, y)
 
             # Fit a local regression for each point, weighted with the weight matrix.
-            self._fit_local_regression_for_each_point(x, robust_weightings, y)
+            self._fit_local_regression_for_all_points(
+                x, robust_weightings, y, raise_errors
+            )
 
         self.fitted = True
         return self
@@ -142,11 +151,58 @@ class Loess:
         x = np.array(x)
         if x.ndim < 2:
             x = x.reshape(-1, 1)
-        predictions = []
-
-        for point in x:
-            predictions.append(self._predict_one_point(point))
+        predictions = [self._predict_one_point(point) for point in x]
         return np.array(predictions)
+
+    def _fit_local_regression_for_all_points(
+        self, x: np.ndarray, w: np.ndarray, y: np.ndarray, raise_errors: bool
+    ) -> None:
+        """Fit a local polynomial regression for all points.
+
+        :param x: The data to fit that will be iterated through.
+        :param w: The robust weightings.
+        :param y: The target data.
+        """
+        for position, point in enumerate(x):
+            # Calculate distances and get the points to be used.
+            distances = np.abs(self._get_distances_to_point(x, point))
+            points_to_use = self._choose_points(
+                distances=distances, nr_points=self.nr_points_to_use
+            )
+
+            # Index the relevant data (i.e. the N nearest points).
+            local_x, local_y, local_w, local_distances = [
+                arr[points_to_use] for arr in [x, y, w, distances]
+            ]
+            if not raise_errors:
+                local_w = self._check_robust_weightings(local_w, point)
+
+            # Calculate the weights for the weighted linear regression.
+            #   The robust weights are given by the residuals; in the first
+            #   iterations, the weights are all ones. The weightings, on
+            #   the other hand, are given by the chosen weighting function.
+            #   The most commonly chosen weighting function (and the default
+            #   here) is the tricube function. Both are combined to obtain
+            #   the weighting matrix for the weighted local linear regression.
+            robust_weights = np.diag(local_w)
+            weightings = self._weigh_points(local_distances, local_distances.max())
+            combined_robust_weightings = robust_weights * weightings
+
+            # Fit the weighted linear regression on the local data and obtain
+            #   the prediction for the current data point.
+            try:
+                current_point = (
+                    WeightedLinearRegression(polynomial_degree=self.polynomial_degree)
+                    .fit(local_x, combined_robust_weightings, local_y)
+                    .predict(point.reshape(1, -1))
+                )
+                self.fitted_values[position] = current_point
+            except np.linalg.LinAlgError:
+                raise ValueError(
+                    "A singular matrix error occurred. This is because of too few "
+                    "data points and strong outliers around some specific x values. \n"
+                    "Increase the share of points to avoid this."
+                )
 
     def _predict_one_point(self, point: Union[np.ndarray, float]) -> np.ndarray:
         """Calculate a prediction for a single point.
@@ -185,7 +241,7 @@ class Loess:
         # If the point is outside the fitted region, no sensible prediction
         #    can be given; therefore, a NaN is returned.
         if np.any(point < self.x.min(axis=0)) or np.any(point > self.x.max(axis=0)):
-            print(
+            warnings.warn(
                 f"Warning: Value {point} is outside the fitted region. "
                 f"No sensible prediction is possible. Returning NaN."
             )
@@ -193,7 +249,7 @@ class Loess:
         distances = self._get_distances_to_point(self.x, point, normalize=True)
         points_to_use = self._choose_points(distances, self.nr_points_to_use)
         local_x = self.x[points_to_use]
-        local_y = self.predict(local_x)
+        local_y = self.fitted_values[points_to_use]
         # Fit a linear regression to the local data points and predict
         #   the value for the given point. This prediction is the
         #   interpolated value.
@@ -245,46 +301,31 @@ class Loess:
             point = standardizer.transform(point)
         return np.linalg.norm(point - x, axis=1)
 
-    def _fit_local_regression_for_each_point(
-        self, x: np.ndarray, w: np.ndarray, y: np.ndarray
-    ) -> None:
-        """Fit a local polynomial regression for each point.
+    @staticmethod
+    def _check_robust_weightings(local_w: np.ndarray, x_value: float):
+        """Check if the robust weightings are sufficiently large.
 
-        :param x: The data to fit that will be iterated through.
-        :param w: The robust weightings. During the first iteration,
-            the weightings are all ones, i.e. no weighting. During
-            subsequent iterations, the robust weightings are calcu-
-            lated based on the residuals.
-        :param y: The target data.
+        In same cases (e.g. temporal data), it might happen that at a specific
+        point, a lot of points are classified as outliers based on the residuals,
+        therefore leading to very low weights. However, the coefficient estimation
+        cannot be done with a singular matrix. Therefore, if the weightings
+        are too small, they are replaced by ones so that they are not weighted
+        at all.
+
+        :param local_w: The weightings of the local points that will be
+            handed to the weighted local linear regression.
+        :param x_value: The value of x that the weightings are calculated for.
+        :return: If the weightings are too small and would result in a
+            singular matrix, all weights are set to 0 to avoid an error.
+            If not, the weightings are returned as they are.
         """
-        for position, point in enumerate(x):
-            # Calculate distances and get the points to be used.
-            distances = np.abs(self._get_distances_to_point(x, point))
-            points_to_use = self._choose_points(
-                distances=distances, nr_points=self.nr_points_to_use
+        if np.sum(local_w) < (len(local_w) * 1e-3):
+            warnings.warn(
+                "The local weightings are so small that they would lead to a "
+                "singular matrix. Setting all weights to 1 to avoid error. \n"
+                f"Check the values around x = {x_value}. \n"
+                "To avoid this warning, set the share of points higher, i.e. "
+                "use more data points in the local weighted regression."
             )
-
-            # Index the relevant data (i.e. the N nearest points).
-            local_x, local_y, local_w, local_distances = [
-                arr[points_to_use] for arr in [x, y, w, distances]
-            ]
-
-            # Calculate the weights for the weighted linear regression.
-            #   The robust weights are given by the residuals; in the first
-            #   iterations, the weights are all ones. The weightings, on
-            #   the other hand, are given by the chosen weighting function.
-            #   The most commonly chosen weighting function (and the default
-            #   here) is the tricube function. Both are combined to obtain
-            #   the weighting matrix for the weighted local linear regression.
-            robust_weights = np.diag(local_w)
-            weightings = self._weigh_points(local_distances, local_distances.max())
-            combined_robust_weightings = robust_weights * weightings
-
-            # Fit the weighted linear regression on the local data and obtain
-            #   the prediction for the current data point.
-            current_point = (
-                WeightedLinearRegression(polynomial_degree=self.polynomial_degree)
-                .fit(local_x, combined_robust_weightings, local_y)
-                .predict(point.reshape(1, -1))
-            )
-            self.fitted_values[position] = current_point
+            return np.ones_like(local_w)
+        return local_w
